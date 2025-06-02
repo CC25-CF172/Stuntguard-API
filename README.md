@@ -5,7 +5,7 @@ Welcome to the Stuntguard API! This API provides endpoints for user authenticati
 ## Base URL
 
 ```bash
-https://stuntguard-api.vercel.app
+https://stuntguard-production.up.railway.app
 ```
 
 ## Endpoints
