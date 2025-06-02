@@ -1,0 +1,44 @@
+{
+  "name": "stuntguard",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install && pip install -r requirements.txt",
+    "dev": "vercel dev",
+    "start": "node ./src/app.js",
+    "start-dev": "nodemon ./src/app.js",
+    "lint": "eslint ./",
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/bell": "^13.0.2",
+    "@hapi/cookie": "^12.0.1",
+    "@hapi/hapi": "^21.3.10",
+    "@hapi/inert": "^7.1.0",
+    "@hapi/jwt": "^3.2.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "bcrypt": "^6.0.0",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.4.5",
+    "form-data": "^4.0.0",
+    "google-auth-library": "^9.13.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "node-schedule": "^2.1.1",
+    "nodemailer": "^7.0.3",
+    "python-shell": "^5.0.0",
+    "timezone": "^1.0.23",
+    "utc": "^0.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "eslint": "^9.9.1",
+    "globals": "^15.9.0",
+    "nodemon": "^3.1.4",
+    "prettier": "^3.5.3"
+  }
+}

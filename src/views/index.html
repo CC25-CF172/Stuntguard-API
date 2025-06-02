@@ -1,0 +1,1826 @@
+<script type="text/javascript">
+  var gk_isXlsx = false;
+  var gk_xlsxFileLookup = {};
+  var gk_fileData = {};
+  function filledCell(cell) {
+    return cell !== "" && cell != null;
+  }
+  function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+      try {
+        var workbook = XLSX.read(gk_fileData[filename], { type: "base64" });
+        var firstSheetName = workbook.SheetNames[0];
+        var worksheet = workbook.Sheets[firstSheetName];
+
+        var jsonData = XLSX.utils.sheet_to_json(worksheet, {
+          header: 1,
+          blankrows: false,
+          defval: "",
+        });
+        var filteredData = jsonData.filter((row) => row.some(filledCell));
+
+        var headerRowIndex = filteredData.findIndex(
+          (row, index) =>
+            row.filter(filledCell).length >=
+            filteredData[index + 1]?.filter(filledCell).length,
+        );
+        if (headerRowIndex === -1 || headerRowIndex > 25) {
+          headerRowIndex = 0;
+        }
+
+        var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+        csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+        return csv;
+      } catch (e) {
+        console.error(e);
+        return "";
+      }
+    }
+    return gk_fileData[filename] || "";
+  }
+</script>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stuntguard API Documentation</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/heroicons@1.0.6/umd/heroicons.min.js"></script>
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <nav
+      class="bg-white shadow-md fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 h-14 md:hidden"
+    >
+      <h2 class="text-lg font-semibold text-gray-800">Stuntguard API</h2>
+      <button
+        id="menu-toggle"
+        class="p-2 bg-blue-600 text-white rounded-lg focus:outline-none"
+      >
+        <!-- Hamburger Icon -->
+        <svg
+          class="h-6 w-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+    </nav>
+
+    <!-- Sidebar (Desktop: Fixed, Mobile: Hidden) -->
+    <aside
+      id="sidebar"
+      class="fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out md:flex flex-col z-20"
+    >
+      <div class="p-6 border-b border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-800">Stuntguard API</h2>
+      </div>
+      <nav class="flex-1 overflow-y-auto">
+        <ul class="p-4 space-y-2">
+          <li>
+            <a
+              href="#welcome"
+              class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+
+              <span>Welcome</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#base-url"
+              class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+
+              <span>Base URL</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#endpoints"
+              class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+
+              <span>Endpoints</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#home"
+              class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#api-information"
+              class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+
+              <span>API Information</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#authentication"
+              class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+
+              <span>Authentication</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#stunting-checks"
+              class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+              <span>Stunting Checks</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#forum"
+              class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+
+              <span>Forum</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#forum-replies"
+              class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+
+              <span>Forum Replies</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="#chatbot"
+              class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+              <span>Chatbot</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Mobile Menu Button -->
+    <aside
+      id="mobile-sidebar"
+      class="hidden bg-white shadow-lg border-t border-gray-200 md:hidden fixed top-14 left-0 right-0 z-100 max-h-[calc(100vh-56px)] overflow-y-auto"
+    >
+      <nav class="flex flex-col p-4 space-y-2">
+        <a
+          href="#welcome"
+          class="block px-4 py-2 rounded hover:bg-gray-100 text-gray-700"
+          >Welcome</a
+        >
+        <a
+          href="#base-url"
+          class="block px-4 py-2 rounded hover:bg-gray-100 text-gray-700"
+          >Base URL</a
+        >
+        <a
+          href="#endpoints"
+          class="block px-4 py-2 rounded hover:bg-gray-100 text-gray-700"
+          >Endpoints</a
+        >
+        <a
+          href="#home"
+          class="block px-4 py-2 rounded hover:bg-gray-100 text-gray-700"
+          >Home</a
+        >
+        <a
+          href="#api-information"
+          class="block px-4 py-2 rounded hover:bg-gray-100 text-gray-700"
+          >API Information</a
+        >
+        <a
+          href="#authentication"
+          class="block px-4 py-2 rounded hover:bg-gray-100 text-gray-700"
+          >Authentication</a
+        >
+        <a
+          href="#stunting-checks"
+          class="block px-4 py-2 rounded hover:bg-gray-100 text-gray-700"
+          >Stunting Checks</a
+        >
+        <a
+          href="#forum"
+          class="block px-4 py-2 rounded hover:bg-gray-100 text-gray-700"
+          >Forum</a
+        >
+        <a
+          href="#forum-replies"
+          class="block px-4 py-2 rounded hover:bg-gray-100 text-gray-700"
+          >Forum Replies</a
+        >
+        <a
+          href="#chatbot"
+          class="block px-4 py-2 rounded hover:bg-gray-100 text-gray-700"
+          >Chatbot</a
+        >
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="pt-24 md:ml-64 px-4 md:px-6 max-w-full md:max-w-5xl mx-auto">
+      <section id="welcome" class="mb-12">
+        <h1 class="text-3xl md:text-4xl font-semibold text-gray-800 mb-4">
+          Stuntguard API Documentation
+        </h1>
+        <p class="text-lg text-gray-600">
+          Welcome to the Stuntguard API! This API provides endpoints for user
+          authentication, stunting check management, and forum interactions. It
+          supports user registration, login (via email or Google), password
+          management, profile updates, stunting data tracking, and forum
+          messaging with replies.
+        </p>
+      </section>
+
+      <section id="base-url" class="mb-12">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Base URL</h2>
+        <pre
+          class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+        ><code>https://stuntguard-api.vercel.app</code></pre>
+      </section>
+
+      <section id="endpoints" class="mb-12">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Endpoints</h2>
+
+        <div id="home" class="mb-8">
+          <h3 class="text-xl font-medium text-gray-800 mb-2">Home</h3>
+          <pre
+            class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+          ><code>GET /</code></pre>
+          <p class="text-gray-600 mb-2">
+            <strong>Response</strong>: Serves the Stuntguard API documentation
+            page (this HTML page).
+          </p>
+          <p class="text-gray-600 mb-2">
+            Returns the API documentation as an HTML page, providing an overview
+            of all available endpoints and their usage. If the page cannot be
+            loaded, a JSON error response is returned.
+          </p>
+          <pre
+            class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+          ><code>HTTP 200: [HTML content of this documentation page]</code></pre>
+          <p class="text-gray-600 mb-2">
+            <strong>Error Response</strong> (if file serving fails):
+          </p>
+          <pre
+            class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+          ><code>{ "success": false, "message": "Failed to retrieve homepage." }</code></pre>
+        </div>
+
+        <div id="api-information" class="mb-8">
+          <h3 class="text-xl font-medium text-gray-800 mb-2">
+            API Information
+          </h3>
+          <pre
+            class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+          ><code>GET /api/v1</code></pre>
+          <p class="text-gray-600 mb-2">
+            <strong>Response</strong>: JSON object with API details.
+          </p>
+          <pre
+            class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+          ><code>{
+  "name": "Stuntguard API",
+  "version": "1.0.0",
+  "description": "Stuntguard API is a backend service providing user authentication, stunting health check management, and community forum features. It supports secure user registration and login, password recovery, profile updates, comprehensive stunting data tracking and analysis, and interactive forum discussions with replies."
+}</code></pre>
+        </div>
+
+        <div id="authentication" class="mb-8">
+          <h3 class="text-xl font-medium text-gray-800 mb-2">Authentication</h3>
+          <p class="text-gray-600 mb-4">
+            All endpoints except <code>GET /</code>, <code>GET /api/v1</code>,
+            <code>POST /api/v1/register</code>, <code>POST /api/v1/login</code>,
+            <code>POST /api/v1/auth/callback/google</code>,
+            <code>POST /api/v1/forgot-password</code>, and
+            <code>POST /api/v1/reset-password</code> require a valid JWT token
+            in the <code>Authorization</code> header as
+            <code>Bearer &lt;token&gt;</code>.
+          </p>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">Register</h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>POST /api/v1/register</code></pre>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>name</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Required. User's full name.</td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>email</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Required. Valid email address.</td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>password</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Required. Minimum 6 characters.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: JSON object with a JWT token or error
+              message.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "data": { "token": "&lt;JWT_TOKEN&gt;" },
+  "message": "User registered successfully."
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Login (Email)
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>POST /api/v1/login</code></pre>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>provider</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">
+                    Required. Must be <code>"email"</code>.
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>user</code></td>
+                  <td class="p-2 border"><code>object</code></td>
+                  <td class="p-2 border">
+                    Required. Contains email and password.
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>user.email</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Required. Valid email address.</td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>user.password</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Required. Minimum 6 characters.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: JSON object with a JWT token or error
+              message.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "data": { "token": "&lt;JWT_TOKEN&gt;" },
+  "message": "User login successful."
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Login (Google)
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>POST /api/v1/auth/callback/google</code></pre>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>provider</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">
+                    Required. Must be <code>"google"</code>.
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>user</code></td>
+                  <td class="p-2 border"><code>object</code></td>
+                  <td class="p-2 border">Required. Contains email.</td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>user.email</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Required. Valid email address.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: JSON object with a JWT token or error
+              message.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "data": { "token": "&lt;JWT_TOKEN&gt;" },
+  "message": "User login successful."
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Forgot Password
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>POST /api/v1/forgot-password</code></pre>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>email</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Required. Valid email address.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: JSON object confirming reset link sent
+              or error message.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Password reset link sent to your email."
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Reset Password
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>POST /api/v1/reset-password</code></pre>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>token</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Required. Password reset token.</td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>new_password</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">
+                    Required. New password, minimum 6 characters.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: JSON object confirming password reset
+              or error message.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Password has been reset successfully."
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">Edit Profile</h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>PUT /api/v1/edit-profile</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>name</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Optional. User's full name.</td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>email</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Optional. Valid email address.</td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>new_password</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">
+                    Optional. New password, minimum 6 characters.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: JSON object with updated profile
+              details or error message.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Profile updated successfully.",
+  "data": { "id": 1, "name": "New Name", "email": "new.email@example.com", ... }
+}</code></pre>
+          </div>
+        </div>
+
+        <div id="stunting-checks" class="mb-8">
+          <h3 class="text-xl font-medium text-gray-800 mb-2">
+            Stunting Checks
+          </h3>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Get All Stunting Checks
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>GET /api/v1/stunting</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Array of stunting check records, each
+              including a status field.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Stunting data retrieved successfully.",
+  "data": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "recommendation_id": 4,
+      "gender": "male",
+      "age_months": 12,
+      "birth_weight_kg": 3.5,
+      "birth_length_cm": 50,
+      "current_weight_kg": 10,
+      "current_length_cm": 75,
+      "exclusive_breastfeeding": "yes",
+      "stunting_probability": 0.1,
+      "stunting_prediction": "negative",
+      "who_classification": "normal",
+      "height_for_age_z_score": -0.5,
+      "created_at": "2025-05-22T23:00:00.000Z",
+      "updated_at": "2025-05-22T23:00:00.000Z",
+      "risk_type": "Normal",
+      "recommendation_notes": "Continue regular health check-ups."
+    },
+    ...
+  ]
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Get Stunting Check by ID
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>GET /api/v1/stunting/{id}</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Parameters</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Parameter</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>id</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">Required. Stunting check ID.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Details of the specified stunting
+              check, including status.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Stunting data retrieved successfully.",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "recommendation_id": 4,
+    "gender": "male",
+    "age_months": 12,
+    "birth_weight_kg": 3.5,
+    "birth_length_cm": 50,
+    "current_weight_kg": 10,
+    "current_length_cm": 75,
+    "exclusive_breastfeeding": "yes",
+    "stunting_probability": 0.1,
+    "stunting_prediction": "negative",
+    "who_classification": "normal",
+    "height_for_age_z_score": -0.5,
+    "created_at": "2025-05-22T23:00:00.000Z",
+    "updated_at": "2025-05-22T23:00:00.000Z",
+    "risk_type": "Normal",
+    "recommendation_notes": "Continue regular health check-ups."
+  }
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Get Stunting History by User ID
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>GET /api/v1/stunting/history/{user_id}</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600-600 mb-2"><strong>Parameters</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Parameter</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>user_id</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">Required. User ID.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Array of stunting check records for the
+              user.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Stunting history retrieved successfully.",
+  "data": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "recommendation_id": 4,
+      "gender": "male",
+      "age_months": 12,
+      "birth_weight_kg": 3.5,
+      "birth_length_cm": 50,
+      "current_weight_kg": 10,
+      "current_length_cm": 75,
+      "exclusive_breastfeeding": "yes",
+      "stunting_probability": 0.1,
+      "stunting_prediction": "negative",
+      "who_classification": "normal",
+      "height_for_age_z_score": -0.5,
+      "created_at": "2025-05-22T23:00:00.000Z",
+      "updated_at": "2025-05-22T23:00:00.000Z",
+      "risk_type": "Normal",
+      "recommendation_notes": "Continue regular health check-ups."
+    },
+    ...
+  ]
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Create Stunting Check
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>POST /api/v1/stunting</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>gender</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">
+                    Required. Child's gender (e.g., "male", "female").
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>age_months</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">
+                    Required. Child's age in months (0-60).
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>birth_weight_kg</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">
+                    Required. Birth weight in kilograms (positive).
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>birth_length_cm</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">
+                    Required. Birth length in centimeters (positive).
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>current_weight_kg</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">
+                    Required. Current weight in kilograms (positive).
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>current_length_cm</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">
+                    Required. Current length in centimeters (positive).
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border">
+                    <code>exclusive_breastfeeding</code>
+                  </td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">
+                    Required. Breastfeeding status (e.g., "yes", "no").
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Success message and stunting check
+              details, including risk type and recommendation notes.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Insert data successfully.",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "recommendation_id": 4,
+    "gender": "male",
+    "age_months": 12,
+    "birth_weight_kg": 3.5,
+    "birth_length_cm": 50,
+    "current_weight_kg": 10,
+    "current_length_cm": 75,
+    "exclusive_breastfeeding": "yes",
+    "stunting_probability": 0.1,
+    "stunting_prediction": "negative",
+    "who_classification": "normal",
+    "height_for_age_z_score": -0.5,
+    "created_at": "2025-05-22T23:00:00.000Z",
+    "updated_at": "2025-05-22T23:00:00.000Z",
+    "risk_type": "Normal",
+    "recommendation_notes": "Continue regular health check-ups."
+  }
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Update Stunting Check
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>PUT /api/v1/stunting/{id}</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Parameters</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Parameter</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>id</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">Required. Stunting check ID.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>gender</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">
+                    Required. Child's gender (e.g., "male", "female").
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>age_months</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">
+                    Required. Child's age in months (0-60).
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>birth_weight_kg</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">
+                    Required. Birth weight in kilograms (positive).
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>birth_length_cm</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">
+                    Required. Birth length in centimeters (positive).
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>current_weight_kg</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">
+                    Required. Current weight in kilograms (positive).
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>current_length_cm</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">
+                    Required. Current length in centimeters (positive).
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border">
+                    <code>exclusive_breastfeeding</code>
+                  </td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">
+                    Required. Breastfeeding status (e.g., "yes", "no").
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Success message and updated stunting
+              check details, including risk type and recommendation notes.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Stunting data updated successfully.",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "recommendation_id": 4,
+    "gender": "male",
+    "age_months": 12,
+    "birth_weight_kg": 3.5,
+    "birth_length_cm": 50,
+    "current_weight_kg": 10,
+    "current_length_cm": 75,
+    "exclusive_breastfeeding": "yes",
+    "stunting_probability": 0.1,
+    "stunting_prediction": "negative",
+    "who_classification": "normal",
+    "height_for_age_z_score": -0.5,
+    "created_at": "2025-05-22T23:00:00.000Z",
+    "updated_at": "2025-05-22T23:00:00.000Z",
+    "risk_type": "Normal",
+    "recommendation_notes": "Continue regular health check-ups."
+  }
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Delete Stunting Check
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>DELETE /api/v1/stunting/{id}</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Parameters</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Parameter</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>id</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">Required. Stunting check ID.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Success message.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Stunting data deleted successfully."
+}</code></pre>
+          </div>
+        </div>
+
+        <div id="forum" class="mb-8">
+          <h3 class="text-xl font-medium text-gray-800 mb-2">Forum</h3>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Get All Forum Messages
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>GET /api/v1/forum</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Array of all forum messages.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Forum data retrieved successfully.",
+  "data": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "title": "Discussion on Child Nutrition",
+      "content": "What are the best foods for toddlers?",
+      "status": true,
+      "created_at": "2025-05-22T23:00:00.000Z",
+      "updated_at": "2025-05-22T23:00:00.000Z"
+    },
+    ...
+  ]
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Get Forum Message by ID
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>GET /api/v1/forum/{id}</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Parameters</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Parameter</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>id</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">Required. Forum message ID.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Details of the specified forum message.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Forum data retrieved successfully.",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "title": "Discussion on Child Nutrition",
+    "content": "What are the best foods for toddlers?",
+    "status": true,
+    "created_at": "2025-05-22T23:00:00.000Z",
+    "updated_at": "2025-05-22T23:00:00.000Z"
+  }
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Create Forum Message
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>POST /api/v1/forum</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>title</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Required. Message title.</td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>content</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Required. Message content.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Success message and forum message
+              details.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Insert data successfully.",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "title": "Discussion on Child Nutrition",
+    "content": "What are the best foods for toddlers?",
+    "status": true,
+    "created_at": "2025-05-22T23:00:00.000Z",
+    "updated_at": "2025-05-22T23:00:00.000Z"
+  }
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Update Forum Message
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>PUT /api/v1/forum/{id}</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Parameters</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Parameter</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>id</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">Required. Forum message ID.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>title</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Optional. Message title.</td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>content</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">
+                    Optional. Message content. At least one of
+                    <code>title</code> or <code>content</code> must be provided.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Success message and updated forum
+              message details.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Forum data updated successfully.",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "title": "Updated Discussion on Child Nutrition",
+    "content": "What are the best foods for toddlers?",
+    "status": true,
+    "created_at": "2025-05-22T23:00:00.000Z",
+    "updated_at": "2025-05-22T23:30:00.000Z"
+  }
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Delete Forum Message
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>DELETE /api/v1/forum/{id}</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Parameters</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Parameter</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>id</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">Required. Forum message ID.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Success message.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Forum data deleted successfully."
+}</code></pre>
+          </div>
+        </div>
+
+        <div id="forum-replies" class="mb-8">
+          <h3 class="text-xl font-medium text-gray-800 mb-2">Forum Replies</h3>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Get All Forum Replies
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>GET /api/v1/forum-replies</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Array of all forum replies.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Forum replies retrieved successfully.",
+  "data": [
+    {
+      "id": 1,
+      "forum_id": 1,
+      "user_id": 2,
+      "content": "I recommend high-protein foods like eggs.",
+      "created_at": "2025-05-22T23:10:00.000Z",
+      "updated_at": "2025-05-22T23:10:00.000Z"
+    },
+    ...
+  ]
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Get Forum Reply by ID
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>GET /api/v1/forum-replies/{id}</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Parameters</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Parameter</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>id</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">Required. Forum reply ID.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Details of the specified forum reply.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Forum reply retrieved successfully.",
+  "data": {
+    "id": 1,
+    "forum_id": 1,
+    "user_id": 2,
+    "content": "I recommend high-protein foods like eggs.",
+    "created_at": "2025-05-22T23:10:00.000Z",
+    "updated_at": "2025-05-22T23:10:00.000Z"
+  }
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Create Forum Reply
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>POST /api/v1/forum-replies</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>forum_id</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">
+                    Required. ID of the forum message being replied to.
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2 border"><code>content</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Required. Reply content.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Success message and forum reply
+              details.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Forum reply added successfully.",
+  "data": {
+    "id": 1,
+    "forum_id": 1,
+    "user_id": 2,
+    "content": "I recommend high-protein foods like eggs.",
+    "created_at": "2025-05-22T23:10:00.000Z",
+    "updated_at": "2025-05-22T23:10:00.000Z"
+  }
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Update Forum Reply
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>PUT /api/v1/forum-replies/{id}</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Parameters</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Parameter</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>id</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">Required. Forum reply ID.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>content</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">Required. Reply content.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Success message and updated forum reply
+              details.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Forum reply updated successfully.",
+  "data": {
+    "id": 1,
+    "forum_id": 1,
+    "user_id": 2,
+    "content": "Updated: I recommend high-protein foods like eggs and lentils.",
+    "created_at": "2025-05-22T23:10:00.000Z",
+    "updated_at": "2025-05-22T23:30:00.000Z"
+  }
+}</code></pre>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Delete Forum Reply
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>DELETE /api/v1/forum-replies/{id}</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Parameters</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Parameter</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>id</code></td>
+                  <td class="p-2 border"><code>number</code></td>
+                  <td class="p-2 border">Required. Forum reply ID.</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Success message.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "message": "Forum reply deleted successfully."
+}</code></pre>
+          </div>
+        </div>
+
+        <div id="chatbot" class="mb-8">
+          <h3 class="text-xl font-medium text-gray-800 mb-2">Chatbot</h3>
+          <div class="mb-6">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">
+              Get Chatbot Response
+            </h4>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>POST /api/v1/chatbot</code></pre>
+            <p class="text-gray-600 mb-2">
+              <strong>Authorization</strong>: Bearer
+              <code>&lt;JWT_TOKEN&gt;</code>
+            </p>
+            <p class="text-gray-600 mb-2"><strong>Body</strong>:</p>
+            <table class="w-full text-left border-collapse mb-4">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="p-2 border">Field</th>
+                  <th class="p-2 border">Type</th>
+                  <th class="p-2 border">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border"><code>message</code></td>
+                  <td class="p-2 border"><code>string</code></td>
+                  <td class="p-2 border">
+                    Required. User's message or question related to stunting.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="text-gray-600 mb-2">
+              <strong>Response</strong>: Success message and chatbot's response
+              to the input message.
+            </p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "data": {
+    "reply": "Stunting adalah kondisi gagal tumbuh pada anak yang menyebabkan tinggi badan tidak sesuai dengan usianya, biasanya akibat kekurangan gizi kronis."
+  },
+  "message": "Successfully processed message."
+}</code></pre>
+            <p class="text-gray-600 mb-2"><strong>Example Request</strong>:</p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "message": "apa itu stunting"
+}</code></pre>
+            <p class="text-gray-600 mb-2"><strong>Example Response</strong>:</p>
+            <pre
+              class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+            ><code>{
+  "success": true,
+  "data": {
+    "reply": "Stunting adalah kondisi gagal tumbuh pada anak yang menyebabkan tinggi badan tidak sesuai dengan usianya, biasanya akibat kekurangan gizi kronis."
+  },
+  "message": "Successfully processed message."
+}</code></pre>
+            <p class="text-gray-600 mb-2"><strong>Error Responses</strong>:</p>
+            <ul class="list-disc pl-5 text-gray-600 mb-2">
+              <li><strong>400 Bad Request</strong> (missing message):</li>
+              <pre
+                class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+              ><code>{
+  "success": false,
+  "message": "No message provided."
+}</code></pre>
+              <li>
+                <strong>400 Bad Request</strong> (chatbot processing failed):
+              </li>
+              <pre
+                class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+              ><code>{
+  "success": false,
+  "message": "Chatbot processing failed"
+}</code></pre>
+              <li>
+                <strong>401 Unauthorized</strong> (invalid or missing token):
+              </li>
+              <pre
+                class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+              ><code>{
+  "success": false,
+  "message": "Invalid token"
+}</code></pre>
+              <li>
+                <strong>500 Internal Server Error</strong> (server or model
+                error):
+              </li>
+              <pre
+                class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
+              ><code>{
+  "success": false,
+  "message": "Failed to process chatbot response"
+}</code></pre>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- JavaScript for Mobile Menu Toggle -->
+    <script>
+      const menuToggle = document.getElementById("menu-toggle");
+      const mobileSidebar = document.getElementById("mobile-sidebar");
+
+      menuToggle.addEventListener("click", () => {
+        mobileSidebar.classList.toggle("hidden");
+      });
+
+      mobileSidebar.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          mobileSidebar.classList.add("hidden");
+        });
+      });
+    </script>
+  </body>
+</html>
