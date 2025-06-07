@@ -41,6 +41,9 @@ RUN npm install --omit=dev
 # Ini akan menyalin 'src/', 'models/', 'app.js', dll., menjaga struktur folder.
 COPY . .
 
+# ---- Salin .env.example menjadi .env ----
+RUN cp .env.example .env
+
 # ---- Konfigurasi Lingkungan (Opsional tapi disarankan) ----
 # Set variabel lingkungan untuk mode produksi
 ENV NODE_ENV production
