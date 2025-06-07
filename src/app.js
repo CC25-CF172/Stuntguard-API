@@ -7,6 +7,15 @@ const init = async () => {
   const server = Hapi.server({
     port: process.env.PORT || 3000,
     host: "0.0.0.0",
+    routes: {
+      cors: {
+        origin: ["*"],
+        headers: ["Accept", "Authorization", "Content-Type", "If-None-Match"],
+        exposedHeaders: ["WWW-Authenticate", "Server-Authorization"],
+        maxAge: 60,
+        credentials: true,
+      },
+    },
   });
 
   await server.register(Inert);
