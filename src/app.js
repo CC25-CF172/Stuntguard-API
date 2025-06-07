@@ -26,7 +26,7 @@ const init = async () => {
 };
 
 process.on("unhandledRejection", (err) => {
-  console.error("Unhandled rejection:", err);
+  console.error("Unhandled Rejection:", err);
   process.exit(1);
 });
 
