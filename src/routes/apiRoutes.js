@@ -142,6 +142,14 @@ const apiRoutes = [
     handler: authController.resetPassword,
   },
   {
+    method: "GET",
+    path: "/api/v1/profile",
+    options: {
+      pre: [verifyToken],
+    },
+    handler: authController.getProfile,
+  },
+  {
     method: "PUT",
     path: "/api/v1/edit-profile",
     options: {

@@ -434,6 +434,53 @@ const authController = {
     }
   },
 
+  getProfile: async (request, h) => {
+    try {
+      const user_id = request.auth.credentials.id;
+
+      const { data: user, error: userError } = await supabase
+        .from("users")
+        .select("id, name, email, created_at, updated_at")
+        .eq("id", user_id)
+        .single();
+
+      if (userError) {
+        console.error("Error fetching user data:", userError);
+        return h
+          .response({
+            success: false,
+            message: "Failed to fetch user data.",
+          })
+          .code(500);
+      }
+
+      if (!user) {
+        return h
+          .response({
+            success: false,
+            message: "User not found.",
+          })
+          .code(404);
+      }
+
+      return h
+        .response({
+          success: true,
+          data: user,
+          message: "Profile retrieved successfully.",
+        })
+        .code(200);
+    } catch (error) {
+      console.error("Error retrieving profile:", error);
+      return h
+        .response({
+          success: false,
+          message: "An error occurred while retrieving the profile.",
+        })
+        .code(500);
+    }
+  },
+
   editProfile: async (request, h) => {
     try {
       const { name, email, new_password } = request.payload;
