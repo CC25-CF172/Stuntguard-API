@@ -89,6 +89,10 @@ const apiRoutes = [
       payload: {
         multipart: true,
       },
+      state: {
+        parse: false,
+        failAction: 'ignore'
+      },
       validate: {
         payload: Joi.object({
           provider: Joi.string().required().label("provider"),
