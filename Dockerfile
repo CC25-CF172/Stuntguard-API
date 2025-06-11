@@ -42,7 +42,6 @@ RUN cp .env.example .env
 
 # ---- Konfigurasi Lingkungan (Opsional tapi disarankan) ----
 ENV NODE_ENV production
-ENV PORT 5000
 
 # ---- Perintah Startup Aplikasi ----
 CMD ["npm", "start"]
