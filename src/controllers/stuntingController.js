@@ -54,7 +54,7 @@ const stuntingController = {
       const options = {
         mode: "text",
         scriptPath: path.join(__dirname, "../utils"),
-        pythonPath: "python3",
+        pythonPath: "python",
         args: [],
       };
 

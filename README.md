@@ -2,6 +2,58 @@
 
 Welcome to the Stuntguard API! This API provides endpoints for user authentication, stunting check management, and forum interactions. It supports user registration, login (via email or Google), password management, profile updates, stunting data tracking, and forum messaging with replies.
 
+## Getting Started
+
+### Prerequisites
+- Node.js (v20 or later)
+- npm
+- Docker (optional, for running with Docker)
+- Git
+
+### Running the Project Locally
+To run the project locally, follow these steps:
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/CC25-CF172/Stuntguard-API.git
+   cd stuntguard-api
+   ```
+2. **Install Python Dependencies:** :
+If the project includes Python dependencies, install them using the requirements.txt file:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+2. **Install Dependencies**
+    ```bash
+    npm install
+    ```
+
+3. **Start the Application**
+    ```bash
+    npm run start
+    ```
+
+### Running with Docker
+To run the project using Docker, follow these steps:
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/CC25-CF172/Stuntguard-API.git
+   
+   cd stuntguard-api
+   ```
+
+2. **Install Dependencies**
+    ```bash
+    docker build -t stuntguard-api .
+    ```
+
+3. **Start the Application**
+    ```bash
+    docker run -p 5000:5000 stuntguard-api
+    ```
+
 ## Base URL
 
 ```bash
