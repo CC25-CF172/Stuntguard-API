@@ -23,8 +23,8 @@ To run the project locally, follow these steps:
 2. **Install Python Dependencies:** :
    If the project includes Python dependencies, install them using the requirements.txt file:
    `bash
-    pip install -r requirements.txt
-    `
+ pip install -r requirements.txt
+ `
 
 3. **Install Dependencies**
 
