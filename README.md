@@ -5,12 +5,14 @@ Welcome to the Stuntguard API! This API provides endpoints for user authenticati
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js (v20 or later)
 - npm
 - Docker (optional, for running with Docker)
 - Git
 
 ### Running the Project Locally
+
 To run the project locally, follow these steps:
 
 1. **Clone the Repository**
@@ -19,40 +21,44 @@ To run the project locally, follow these steps:
    cd stuntguard-api
    ```
 2. **Install Python Dependencies:** :
-If the project includes Python dependencies, install them using the requirements.txt file:
-    ```bash
+   If the project includes Python dependencies, install them using the requirements.txt file:
+   `bash
     pip install -r requirements.txt
-    ```
+    `
 
-2. **Install Dependencies**
-    ```bash
-    npm install
-    ```
+3. **Install Dependencies**
 
-3. **Start the Application**
-    ```bash
-    npm run start
-    ```
+   ```bash
+   npm install
+   ```
+
+4. **Start the Application**
+   ```bash
+   npm run start
+   ```
 
 ### Running with Docker
+
 To run the project using Docker, follow these steps:
 
 1. **Clone the Repository**
+
    ```bash
    git clone https://github.com/CC25-CF172/Stuntguard-API.git
-   
+
    cd stuntguard-api
    ```
 
 2. **Install Dependencies**
-    ```bash
-    docker build -t stuntguard-api .
-    ```
+
+   ```bash
+   docker build -t stuntguard-api .
+   ```
 
 3. **Start the Application**
-    ```bash
-    docker run -p 5000:5000 stuntguard-api
-    ```
+   ```bash
+   docker run -p 5000:5000 stuntguard-api
+   ```
 
 ## Base URL
 
@@ -273,7 +279,30 @@ GET /api/v1/stunting
       "created_at": "2025-05-22T23:00:00.000Z",
       "updated_at": "2025-05-22T23:00:00.000Z",
       "risk_type": "Normal",
-      "recommendation_notes": "Continue regular health check-ups."
+      "recommendation_notes": {
+                "JadwalKontrol": [
+                    "Kontrol rutin ke Posyandu: Setiap bulan",
+                    "Kunjungan ke dokter anak: Setiap 3-6 bulan untuk pemeriksaan tumbuh kembang"
+                ],
+                "RekomendasiGizi": [
+                    "Berikan ASI eksklusif hingga 6 bulan (jika usia < 6 bulan)",
+                    "Lanjutkan pemberian ASI hingga 2 tahun dengan MPASI yang bergizi",
+                    "Pastikan asupan protein hewani setiap hari (telur, ikan, daging, susu)",
+                    "Berikan makanan beragam dengan 4 bintang (karbohidrat, protein, lemak, vitamin-mineral)",
+                    "Hindari makanan tinggi gula dan garam berlebihan"
+                ],
+                "RekomendasiUtama": [
+                    "Pertahankan pola asuh dan gizi yang sudah baik",
+                    "Lanjutkan pemantauan rutin pertumbuhan dan perkembangan",
+                    "Tetap berikan stimulasi optimal untuk perkembangan anak"
+                ],
+                "RekomendasiPerawatan": [
+                    "Kunjungi Posyandu setiap bulan untuk pemantauan berat dan tinggi badan",
+                    "Lengkapi imunisasi sesuai jadwal",
+                    "Jaga kebersihan diri dan lingkungan",
+                    "Berikan stimulasi bermain dan belajar sesuai usia"
+                ]
+            }
     },
     ...
   ]
@@ -317,7 +346,30 @@ GET /api/v1/stunting/{id}
     "created_at": "2025-05-22T23:00:00.000Z",
     "updated_at": "2025-05-22T23:00:00.000Z",
     "risk_type": "Normal",
-    "recommendation_notes": "Continue regular health check-ups."
+    "recommendation_notes": {
+      "JadwalKontrol": [
+        "Kontrol rutin ke Posyandu: Setiap bulan",
+        "Kunjungan ke dokter anak: Setiap 3-6 bulan untuk pemeriksaan tumbuh kembang"
+      ],
+      "RekomendasiGizi": [
+        "Berikan ASI eksklusif hingga 6 bulan (jika usia < 6 bulan)",
+        "Lanjutkan pemberian ASI hingga 2 tahun dengan MPASI yang bergizi",
+        "Pastikan asupan protein hewani setiap hari (telur, ikan, daging, susu)",
+        "Berikan makanan beragam dengan 4 bintang (karbohidrat, protein, lemak, vitamin-mineral)",
+        "Hindari makanan tinggi gula dan garam berlebihan"
+      ],
+      "RekomendasiUtama": [
+        "Pertahankan pola asuh dan gizi yang sudah baik",
+        "Lanjutkan pemantauan rutin pertumbuhan dan perkembangan",
+        "Tetap berikan stimulasi optimal untuk perkembangan anak"
+      ],
+      "RekomendasiPerawatan": [
+        "Kunjungi Posyandu setiap bulan untuk pemantauan berat dan tinggi badan",
+        "Lengkapi imunisasi sesuai jadwal",
+        "Jaga kebersihan diri dan lingkungan",
+        "Berikan stimulasi bermain dan belajar sesuai usia"
+      ]
+    }
   }
 }
 ```
@@ -360,7 +412,30 @@ GET /api/v1/stunting/history/{user_id}
       "created_at": "2025-05-22T23:00:00.000Z",
       "updated_at": "2025-05-22T23:00:00.000Z",
       "risk_type": "Normal",
-      "recommendation_notes": "Continue regular health check-ups."
+      "recommendation_notes": {
+                "JadwalKontrol": [
+                    "Kontrol rutin ke Posyandu: Setiap bulan",
+                    "Kunjungan ke dokter anak: Setiap 3-6 bulan untuk pemeriksaan tumbuh kembang"
+                ],
+                "RekomendasiGizi": [
+                    "Berikan ASI eksklusif hingga 6 bulan (jika usia < 6 bulan)",
+                    "Lanjutkan pemberian ASI hingga 2 tahun dengan MPASI yang bergizi",
+                    "Pastikan asupan protein hewani setiap hari (telur, ikan, daging, susu)",
+                    "Berikan makanan beragam dengan 4 bintang (karbohidrat, protein, lemak, vitamin-mineral)",
+                    "Hindari makanan tinggi gula dan garam berlebihan"
+                ],
+                "RekomendasiUtama": [
+                    "Pertahankan pola asuh dan gizi yang sudah baik",
+                    "Lanjutkan pemantauan rutin pertumbuhan dan perkembangan",
+                    "Tetap berikan stimulasi optimal untuk perkembangan anak"
+                ],
+                "RekomendasiPerawatan": [
+                    "Kunjungi Posyandu setiap bulan untuk pemantauan berat dan tinggi badan",
+                    "Lengkapi imunisasi sesuai jadwal",
+                    "Jaga kebersihan diri dan lingkungan",
+                    "Berikan stimulasi bermain dan belajar sesuai usia"
+                ]
+            }
     },
     ...
   ]
@@ -410,7 +485,30 @@ POST /api/v1/stunting
     "created_at": "2025-05-22T23:00:00.000Z",
     "updated_at": "2025-05-22T23:00:00.000Z",
     "risk_type": "Normal",
-    "recommendation_notes": "Continue regular health check-ups."
+    "recommendation_notes": {
+      "JadwalKontrol": [
+        "Kontrol rutin ke Posyandu: Setiap bulan",
+        "Kunjungan ke dokter anak: Setiap 3-6 bulan untuk pemeriksaan tumbuh kembang"
+      ],
+      "RekomendasiGizi": [
+        "Berikan ASI eksklusif hingga 6 bulan (jika usia < 6 bulan)",
+        "Lanjutkan pemberian ASI hingga 2 tahun dengan MPASI yang bergizi",
+        "Pastikan asupan protein hewani setiap hari (telur, ikan, daging, susu)",
+        "Berikan makanan beragam dengan 4 bintang (karbohidrat, protein, lemak, vitamin-mineral)",
+        "Hindari makanan tinggi gula dan garam berlebihan"
+      ],
+      "RekomendasiUtama": [
+        "Pertahankan pola asuh dan gizi yang sudah baik",
+        "Lanjutkan pemantauan rutin pertumbuhan dan perkembangan",
+        "Tetap berikan stimulasi optimal untuk perkembangan anak"
+      ],
+      "RekomendasiPerawatan": [
+        "Kunjungi Posyandu setiap bulan untuk pemantauan berat dan tinggi badan",
+        "Lengkapi imunisasi sesuai jadwal",
+        "Jaga kebersihan diri dan lingkungan",
+        "Berikan stimulasi bermain dan belajar sesuai usia"
+      ]
+    }
   }
 }
 ```
@@ -463,7 +561,30 @@ PUT /api/v1/stunting/{id}
     "created_at": "2025-05-22T23:00:00.000Z",
     "updated_at": "2025-05-22T23:00:00.000Z",
     "risk_type": "Normal",
-    "recommendation_notes": "Continue regular health check-ups."
+    "recommendation_notes": {
+      "JadwalKontrol": [
+        "Kontrol rutin ke Posyandu: Setiap bulan",
+        "Kunjungan ke dokter anak: Setiap 3-6 bulan untuk pemeriksaan tumbuh kembang"
+      ],
+      "RekomendasiGizi": [
+        "Berikan ASI eksklusif hingga 6 bulan (jika usia < 6 bulan)",
+        "Lanjutkan pemberian ASI hingga 2 tahun dengan MPASI yang bergizi",
+        "Pastikan asupan protein hewani setiap hari (telur, ikan, daging, susu)",
+        "Berikan makanan beragam dengan 4 bintang (karbohidrat, protein, lemak, vitamin-mineral)",
+        "Hindari makanan tinggi gula dan garam berlebihan"
+      ],
+      "RekomendasiUtama": [
+        "Pertahankan pola asuh dan gizi yang sudah baik",
+        "Lanjutkan pemantauan rutin pertumbuhan dan perkembangan",
+        "Tetap berikan stimulasi optimal untuk perkembangan anak"
+      ],
+      "RekomendasiPerawatan": [
+        "Kunjungi Posyandu setiap bulan untuk pemantauan berat dan tinggi badan",
+        "Lengkapi imunisasi sesuai jadwal",
+        "Jaga kebersihan diri dan lingkungan",
+        "Berikan stimulasi bermain dan belajar sesuai usia"
+      ]
+    }
   }
 }
 ```

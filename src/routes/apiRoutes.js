@@ -91,7 +91,7 @@ const apiRoutes = [
       },
       state: {
         parse: false,
-        failAction: 'ignore'
+        failAction: "ignore",
       },
       validate: {
         payload: Joi.object({
