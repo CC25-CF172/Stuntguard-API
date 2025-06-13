@@ -65,11 +65,32 @@ const forumController = {
 
       const { data, error } = await supabase
         .from("forum")
-        .select("*")
+        .select(
+          `
+        id,
+        user_id,
+        title,
+        content,
+        status,
+        created_at,
+        updated_at,
+        users (name)
+      `,
+        )
         .eq("id", id)
         .single();
 
-      if (error || !data) {
+      if (error) {
+        console.error("Supabase error:", error);
+        return h
+          .response({
+            success: false,
+            message: error.message || "Forum data not found.",
+          })
+          .code(404);
+      }
+
+      if (!data) {
         return h
           .response({
             success: false,
@@ -78,10 +99,21 @@ const forumController = {
           .code(404);
       }
 
+      const transformedData = {
+        id: data.id,
+        user_id: data.user_id,
+        user_name: data.users?.name || "Unknown User",
+        title: data.title,
+        content: data.content,
+        status: data.status,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+      };
+
       return h
         .response({
           success: true,
-          data: { ...data },
+          data: transformedData,
           message: "Forum data retrieved successfully.",
         })
         .code(200);
@@ -98,21 +130,52 @@ const forumController = {
 
   getAllMessageForum: async (request, h) => {
     try {
-      const { data, error } = await supabase.from("forum").select("*");
+      const { data, error } = await supabase.from("forum").select(`
+        id,
+        user_id,
+        title,
+        content,
+        status,
+        created_at,
+        updated_at,
+        users (name)
+      `);
 
       if (error) {
+        console.error("Supabase error:", error);
         return h
           .response({
             success: false,
-            message: "An error occurred while fetching the data.",
+            message:
+              error.message || "An error occurred while fetching the data.",
           })
           .code(500);
       }
 
+      if (!data || data.length === 0) {
+        return h
+          .response({
+            success: false,
+            message: "No forum data found.",
+          })
+          .code(404);
+      }
+
+      const transformedData = data.map((item) => ({
+        id: item.id,
+        user_id: item.user_id,
+        user_name: item.users?.name || "Unknown User",
+        title: item.title,
+        content: item.content,
+        status: item.status,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+      }));
+
       return h
         .response({
           success: true,
-          data: data,
+          data: transformedData,
           message: "Forum data retrieved successfully.",
         })
         .code(200);
@@ -263,19 +326,50 @@ const forumController = {
 
   getAllMessageForumReplies: async (request, h) => {
     try {
-      const { data, error } = await supabase.from("forum_replies").select("*");
+      const { data, error } = await supabase.from("forum_replies").select(`
+        id,
+        forum_id,
+        user_id,
+        content,
+        created_at,
+        updated_at,
+        users (name)
+      `);
+
       if (error) {
+        console.error("Supabase error:", error);
         return h
           .response({
             success: false,
-            message: "Failed to fetch forum replies",
+            message: error.message || "Failed to fetch forum replies",
           })
           .code(500);
       }
+
+      if (!data || data.length === 0) {
+        return h
+          .response({
+            success: false,
+            message: "No forum replies found.",
+          })
+          .code(404);
+      }
+
+      // Transformasi data untuk menyertakan user_name
+      const transformedData = data.map((item) => ({
+        id: item.id,
+        forum_id: item.forum_id,
+        user_id: item.user_id,
+        user_name: item.users?.name || "Unknown User",
+        content: item.content,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+      }));
+
       return h
         .response({
           success: true,
-          data,
+          data: transformedData,
           message: "Forum replies retrieved successfully",
         })
         .code(200);
@@ -293,20 +387,59 @@ const forumController = {
   getMessageForumReply: async (request, h) => {
     try {
       const { id } = request.params;
+
       const { data, error } = await supabase
         .from("forum_replies")
-        .select("*")
-        .eq("id", id)
-        .single();
-      if (error || !data) {
+        .select(
+          `
+        id,
+        forum_id,
+        user_id,
+        content,
+        created_at,
+        updated_at,
+        users (name)
+      `,
+        )
+        .eq("id", id);
+
+      if (error) {
+        console.error("Supabase error:", error);
         return h
-          .response({ success: false, message: "Forum reply not found" })
+          .response({
+            success: false,
+            message: error.message || "Forum reply not found",
+          })
           .code(404);
       }
+
+      if (!data || data.length === 0) {
+        return h
+          .response({
+            success: false,
+            message: "Forum reply not found.",
+          })
+          .code(404);
+      }
+
+      // Ambil baris pertama karena id seharusnya unik
+      const item = data[0];
+
+      // Transformasi data untuk menyertakan user_name
+      const transformedData = {
+        id: item.id,
+        forum_id: item.forum_id,
+        user_id: item.user_id,
+        user_name: item.users?.name || "Unknown User",
+        content: item.content,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+      };
+
       return h
         .response({
           success: true,
-          data,
+          data: transformedData,
           message: "Forum reply retrieved successfully",
         })
         .code(200);

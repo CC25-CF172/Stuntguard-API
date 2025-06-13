@@ -23,8 +23,8 @@ To run the project locally, follow these steps:
 2. **Install Python Dependencies:** :
    If the project includes Python dependencies, install them using the requirements.txt file:
    `bash
- pip install -r requirements.txt
- `
+pip install -r requirements.txt
+`
 
 3. **Install Dependencies**
 
@@ -631,6 +631,7 @@ GET /api/v1/forum
     {
       "id": 1,
       "user_id": 1,
+      "user_name": "vio",
       "title": "Discussion on Child Nutrition",
       "content": "What are the best foods for toddlers?",
       "status": true,
@@ -664,6 +665,7 @@ GET /api/v1/forum/{id}
   "data": {
     "id": 1,
     "user_id": 1,
+    "user_name": "vio",
     "title": "Discussion on Child Nutrition",
     "content": "What are the best foods for toddlers?",
     "status": true,
@@ -785,6 +787,7 @@ GET /api/v1/forum-replies
       "id": 1,
       "forum_id": 1,
       "user_id": 2,
+      "user_name": "vio",
       "content": "I recommend high-protein foods like eggs.",
       "created_at": "2025-05-22T23:10:00.000Z",
       "updated_at": "2025-05-22T23:10:00.000Z"
@@ -817,6 +820,7 @@ GET /api/v1/forum-replies/{id}
     "id": 1,
     "forum_id": 1,
     "user_id": 2,
+    "user_name": "vio",
     "content": "I recommend high-protein foods like eggs.",
     "created_at": "2025-05-22T23:10:00.000Z",
     "updated_at": "2025-05-22T23:10:00.000Z"
