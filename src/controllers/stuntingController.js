@@ -21,6 +21,24 @@ function buildRecommendationNotes(rec) {
   };
 }
 
+// Kolom di tabel stunting_checks punya CHECK constraint yang membatasi
+// nilai ke format tertentu. Payload dari frontend dan output dari model
+// Python tidak selalu memakai format yang sama, jadi dinormalisasi di sini
+// sebelum disimpan ke database.
+function normalizeGender(value) {
+  const map = { M: "male", F: "female", male: "male", female: "female" };
+  return map[value] || String(value).toLowerCase();
+}
+
+function normalizeYesNo(value) {
+  return String(value).toLowerCase() === "yes" ? "yes" : "no";
+}
+
+function normalizeStuntingPrediction(value) {
+  const v = String(value).toLowerCase();
+  return v === "yes" || v === "positive" ? "positive" : "negative";
+}
+
 const stuntingController = {
   createCheckStunting: async (request, h) => {
     try {
@@ -159,15 +177,15 @@ const stuntingController = {
       const newItem = {
         user_id,
         recommendation_id,
-        gender,
+        gender: normalizeGender(gender),
         age_months,
         birth_weight_kg,
         birth_length_cm,
         current_weight_kg,
         current_length_cm,
-        exclusive_breastfeeding,
+        exclusive_breastfeeding: normalizeYesNo(exclusive_breastfeeding),
         stunting_probability,
-        stunting_prediction,
+        stunting_prediction: normalizeStuntingPrediction(stunting_prediction),
         who_classification,
         height_for_age_z_score,
         risk_type,
@@ -429,15 +447,15 @@ const stuntingController = {
         .from("stunting_checks")
         .update({
           recommendation_id,
-          gender,
+          gender: normalizeGender(gender),
           age_months,
           birth_weight_kg,
           birth_length_cm,
           current_weight_kg,
           current_length_cm,
-          exclusive_breastfeeding,
+          exclusive_breastfeeding: normalizeYesNo(exclusive_breastfeeding),
           stunting_probability,
-          stunting_prediction,
+          stunting_prediction: normalizeStuntingPrediction(stunting_prediction),
           who_classification,
           height_for_age_z_score,
           risk_type,
