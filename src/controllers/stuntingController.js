@@ -8,6 +8,19 @@ const path = require("path");
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+const RECOMMENDATION_COLUMNS =
+  "id, risk_type, jadwal_kontrol, rekomendasi_gizi, rekomendasi_utama, rekomendasi_perawatan";
+
+function buildRecommendationNotes(rec) {
+  if (!rec) return null;
+  return {
+    JadwalKontrol: rec.jadwal_kontrol,
+    RekomendasiGizi: rec.rekomendasi_gizi,
+    RekomendasiUtama: rec.rekomendasi_utama,
+    RekomendasiPerawatan: rec.rekomendasi_perawatan,
+  };
+}
+
 const stuntingController = {
   createCheckStunting: async (request, h) => {
     try {
@@ -121,7 +134,7 @@ const stuntingController = {
       const { data: recommendationData, error: recommendationError } =
         await supabase
           .from("recommendations")
-          .select("id, risk_type, notes")
+          .select(RECOMMENDATION_COLUMNS)
           .eq("risk_type", predict_risk_type)
           .single();
 
@@ -140,7 +153,7 @@ const stuntingController = {
 
       const recommendation_id = recommendationData.id;
       const risk_type = recommendationData.risk_type;
-      const notes = recommendationData.notes;
+      const recommendation_notes = buildRecommendationNotes(recommendationData);
       const timestamp = dayjs().tz("Asia/Jakarta").toISOString();
 
       const newItem = {
@@ -179,7 +192,7 @@ const stuntingController = {
           data: {
             ...data[0],
             risk_type: risk_type,
-            recommendation_notes: notes,
+            recommendation_notes: recommendation_notes,
           },
           message: "Insert data successfully.",
         })
@@ -199,7 +212,7 @@ const stuntingController = {
         .select(
           `
           *,
-          recommendations!stunting_checks_recommendation_id_fkey(risk_type, notes)
+          recommendations!stunting_checks_recommendation_id_fkey(risk_type, jadwal_kontrol, rekomendasi_gizi, rekomendasi_utama, rekomendasi_perawatan)
         `,
         )
         .eq("id", id)
@@ -222,7 +235,7 @@ const stuntingController = {
           data: {
             ...stuntingData,
             risk_type: recommendations.risk_type,
-            recommendation_notes: recommendations.notes,
+            recommendation_notes: buildRecommendationNotes(recommendations),
           },
           message: "Stunting data retrieved successfully.",
         })
@@ -242,7 +255,7 @@ const stuntingController = {
     try {
       const { data, error } = await supabase.from("stunting_checks").select(`
           *,
-          recommendations!stunting_checks_recommendation_id_fkey(risk_type, notes)
+          recommendations!stunting_checks_recommendation_id_fkey(risk_type, jadwal_kontrol, rekomendasi_gizi, rekomendasi_utama, rekomendasi_perawatan)
         `);
 
       if (error) {
@@ -259,7 +272,7 @@ const stuntingController = {
         return {
           ...stuntingData,
           risk_type: recommendations.risk_type,
-          recommendation_notes: recommendations.notes,
+          recommendation_notes: buildRecommendationNotes(recommendations),
         };
       });
 
@@ -389,7 +402,7 @@ const stuntingController = {
       const { data: recommendationData, error: recommendationError } =
         await supabase
           .from("recommendations")
-          .select("id, risk_type, notes")
+          .select(RECOMMENDATION_COLUMNS)
           .eq("risk_type", predict_risk_type)
           .single();
 
@@ -408,7 +421,7 @@ const stuntingController = {
 
       const recommendation_id = recommendationData.id;
       const risk_type = recommendationData.risk_type;
-      const notes = recommendationData.notes;
+      const recommendation_notes = buildRecommendationNotes(recommendationData);
       const timestamp = dayjs().tz("Asia/Jakarta").toISOString();
 
       const { data, error } = await supabase
@@ -448,7 +461,7 @@ const stuntingController = {
           data: {
             ...data[0],
             risk_type: risk_type,
-            recommendation_notes: notes,
+            recommendation_notes: recommendation_notes,
           },
         })
         .code(200);
@@ -523,7 +536,7 @@ const stuntingController = {
         .select(
           `
           *,
-          recommendations!stunting_checks_recommendation_id_fkey(risk_type, notes)
+          recommendations!stunting_checks_recommendation_id_fkey(risk_type, jadwal_kontrol, rekomendasi_gizi, rekomendasi_utama, rekomendasi_perawatan)
         `,
         )
         .eq("user_id", user_id);
@@ -552,7 +565,7 @@ const stuntingController = {
         return {
           ...stuntingData,
           risk_type: recommendations.risk_type,
-          recommendation_notes: recommendations.notes,
+          recommendation_notes: buildRecommendationNotes(recommendations),
         };
       });
 
