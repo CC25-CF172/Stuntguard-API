@@ -170,6 +170,7 @@ const stuntingController = {
         stunting_prediction,
         who_classification,
         height_for_age_z_score,
+        risk_type,
         created_at: timestamp,
         updated_at: timestamp,
       };
@@ -439,6 +440,7 @@ const stuntingController = {
           stunting_prediction,
           who_classification,
           height_for_age_z_score,
+          risk_type,
           updated_at: timestamp,
         })
         .eq("id", id)
