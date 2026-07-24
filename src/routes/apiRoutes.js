@@ -200,7 +200,7 @@ const apiRoutes = [
       pre: [verifyToken],
       validate: {
         params: Joi.object({
-          user_id: Joi.number().required(),
+          user_id: Joi.string().guid().required(),
         }),
       },
     },
