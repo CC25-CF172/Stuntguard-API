@@ -1,16 +1,26 @@
 const Hapi = require("@hapi/hapi");
 const Inert = require("@hapi/inert");
 const apiRoutes = require("./routes/apiRoutes");
+
 require("dotenv").config();
 
 const init = async () => {
+  const frontendOrigin =
+    process.env.FRONTEND_URL ||
+    "https://stuntguard-fronend-production.up.railway.app";
+
   const server = Hapi.server({
     port: process.env.PORT || 3000,
     host: process.env.NODE_ENV === "production" ? "0.0.0.0" : "localhost",
     routes: {
       cors: {
-        origin: ["*"],
-        headers: ["Accept", "Authorization", "Content-Type", "If-None-Match"],
+        origin: [frontendOrigin],
+        headers: [
+          "Accept",
+          "Authorization",
+          "Content-Type",
+          "If-None-Match",
+        ],
         exposedHeaders: ["WWW-Authenticate", "Server-Authorization"],
         maxAge: 60,
         credentials: true,
