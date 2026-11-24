@@ -1,47 +1,48 @@
-# ---- Instalasi Node.js ----
-# Gunakan base image yang sudah punya Node.js dan Python.
-# node:20-bullseye-slim adalah pilihan yang baik karena sudah termasuk Node.js dan Python3
-FROM node:20.18.0-bullseye-slim
 
-# Atur direktori kerja di dalam kontainer
+# ---- Base Image ----
+FROM node:20.18.0-bookworm-slim
+
+# ---- Working Directory ----
 WORKDIR /app
 
-# ---- Instalasi Dependensi Sistem (jika diperlukan) ----
-# Update apt dan instal pustaka yang mungkin diperlukan oleh TensorFlow/NLTK
-# atau dependensi pip lainnya. 'build-essential' untuk kompilasi, 'libgl1-mesa-glx' untuk TensorFlow.
-# Hapus cache apt setelah instalasi untuk menjaga ukuran image tetap kecil.
+# ---- System Dependencies ----
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         build-essential \
+        python3 \
+        python3-venv \
         python3-pip \
         git \
-        libgl1-mesa-glx \
+        libgl1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Tambahkan symlink python3 ke python
-RUN ln -s /usr/bin/python3 /usr/bin/python
+# ---- Python Virtual Environment ----
+RUN python3 -m venv /opt/venv
 
-# ---- Instalasi Dependensi Python ----
+ENV PATH="/opt/venv/bin:$PATH"
+ENV NLTK_DATA="/usr/share/nltk_data"
+
+# ---- Python Dependencies ----
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
 
-# ---- Download NLTK Data ----
-# Download punkt_tab and wordnet resources for NLTK
-RUN python3 -m nltk.downloader punkt_tab wordnet
+RUN python -m pip install --no-cache-dir --upgrade pip && \
+    python -m pip install --no-cache-dir -r requirements.txt
 
-# ---- Instalasi Dependensi Node.js ----
-# Salin package.json dan package-lock.json terlebih dahulu untuk caching.
+# ---- Download NLTK Resources ----
+RUN python -m nltk.downloader \
+    -d /usr/share/nltk_data \
+    punkt_tab wordnet
+
+# ---- Node.js Dependencies ----
 COPY package.json package-lock.json ./
-RUN npm install --omit=dev
 
-# ---- Salin Seluruh Kode Aplikasi ----
+RUN npm ci --omit=dev
+
+# ---- Application Source Code ----
 COPY . .
 
-# ---- Salin .env.example menjadi .env ----
-RUN cp .env.example .env
+# ---- Production Environment ----
+ENV NODE_ENV=production
 
-# ---- Konfigurasi Lingkungan (Opsional tapi disarankan) ----
-ENV NODE_ENV production
-
-# ---- Perintah Startup Aplikasi ----
+# ---- Start Application ----
 CMD ["npm", "start"]
