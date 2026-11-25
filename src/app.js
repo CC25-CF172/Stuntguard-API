@@ -5,10 +5,14 @@ const apiRoutes = require("./routes/apiRoutes");
 require("dotenv").config();
 
 const init = async () => {
-  const frontendOrigin =
-    process.env.FRONTEND_URL ||
+  const productionFrontendOrigin =
     "https://stuntguard-fronend-production.up.railway.app";
-
+  const frontendOrigin =
+    process.env.FRONTEND_URL || productionFrontendOrigin;
+  const allowedOrigins = [
+    ...new Set([productionFrontendOrigin, new URL(frontendOrigin).origin]),
+  ];
+  
   const server = Hapi.server({
     port: process.env.PORT || 3000,
     host: process.env.NODE_ENV === "production" ? "0.0.0.0" : "localhost",
