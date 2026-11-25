@@ -12,13 +12,13 @@ const init = async () => {
   const allowedOrigins = [
     ...new Set([productionFrontendOrigin, new URL(frontendOrigin).origin]),
   ];
-  
+
   const server = Hapi.server({
     port: process.env.PORT || 3000,
     host: process.env.NODE_ENV === "production" ? "0.0.0.0" : "localhost",
     routes: {
       cors: {
-        origin: [frontendOrigin],
+        origin: allowedOrigins,
         headers: [
           "Accept",
           "Authorization",
