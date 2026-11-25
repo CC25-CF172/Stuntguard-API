@@ -8,11 +8,6 @@ const path = require("path");
 
 const apiRoutes = [
   {
-    method: "OPTIONS",
-    path: "/api/v1/register",
-    handler: (request, h) => h.response().code(204),
-  },
-  {
     method: "GET",
     path: "/",
     handler: async (request, h) => {
